@@ -18,14 +18,13 @@ class Game:
 		self.window=pygame.display.set_mode((self.width,self.height))
 		pygame.display.set_caption("Snake Game")
 		self.font = pygame.font.Font('freesansbold.ttf', 24)
-		self.text=self.font.render("SCORE : 0",True,pygame.Color(0,255,0))
-		self.textRect=self.text.get_rect()
-		self.textRect.x=100
-		self.textRect.y=405
-		self.score=0
+		self.scoreText=self.font.render("SCORE : 0",True,pygame.Color(0,255,0))
+		self.scoreTextRect=self.scoreText.get_rect()
+		self.scoreTextRect.x=100
+		self.scoreTextRect.y=405
 
-	def start(self):
-		self.initialize()
+	def setup(self):
+		self.scoreText=self.font.render("SCORE : 0",True,pygame.Color(0,255,0))
 		self.snake_head=Snake.Snake(150,150)
 		self.snake_head.image.fill(pygame.Color(0,0,255))
 		self.spritesList.add(self.snake_head)
@@ -33,9 +32,12 @@ class Game:
 			segment=Snake.Snake(150,150+i*10)
 			self.snake_segs.append(segment)
 			self.spritesList.add(segment)
-		#self.snake.set_head(self.window)
 		self.food=Food.Food()
-		# self.food.draw_food(self.window)
+		self.score=0
+
+	def start(self):
+		self.initialize()
+		self.setup()
 		clock=pygame.time.Clock()
 
 		while(self.running):
@@ -62,24 +64,47 @@ class Game:
 				s[0].move_down()
 
 			self.window.fill(pygame.Color(0,0,0))
-			self.window.blit(self.text,self.textRect)
+			pygame.draw.line(self.window,pygame.Color(255,255,255),(0,self.height-30),(self.width,self.height-30),2)
+			self.window.blit(self.scoreText,self.scoreTextRect)
 			self.food.draw_food(self.window)
 
 			if(self.food.food_eaten(s[0].rect)):
 				seg=Snake.Snake(last_seg.rect.x,last_seg.rect.y)
 				seg.direction=last_seg.direction
-				#s[0].rect.x=s[0].rect.x+10
-				#snake_head.rect.y=snake_head.rect.y
 				self.snake_segs.append(seg)
 				self.score+=1
-				self.text=self.font.render("SCORE : "+str(self.score),True,pygame.Color(0,255,0))
+				self.scoreText=self.font.render("SCORE : "+str(self.score),True,pygame.Color(0,255,0))
 				self.food.new_food(s)
-				#self.spritesList.add(seg)
-				#self.snake.add_seg(self.window)
+				
 			if(s[0].collision(s,self.width,self.height-30)):
 				self.running=False
-				pygame.quit()
-				sys.exit()
+				gameOverText=self.font.render("GAME OVER",True,pygame.Color(0,255,0))
+				gameOverTextRect=gameOverText.get_rect()
+				gameOverTextRect.x=100
+				gameOverTextRect.y=200
+				playAgainText=self.font.render("Play Again? (Y/N)",True,pygame.Color(0,255,0))
+				playAgainTextRect=playAgainText.get_rect()
+				playAgainTextRect.x=80
+				playAgainTextRect.y=230
+				self.window.blit(gameOverText,gameOverTextRect)
+				self.window.blit(playAgainText,playAgainTextRect)
+				pygame.display.flip()
+				l=0
+				while True:
+					for event in pygame.event.get():
+						if(event.type==KEYDOWN):
+							if(event.key==pygame.K_y):
+								self.running=True
+								self.spritesList.empty()
+								self.setup()
+								l=1
+								break
+							if(event.key==pygame.K_n):
+								pygame.quit()
+								sys.exit()
+					if(l==1):
+						break
+					
 
 			
 			self.spritesList.update()
