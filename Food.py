@@ -30,16 +30,3 @@ class Food:
 			rand_y=random.randrange(0,400,10)
 		self.x=rand_x
 		self.y=rand_y
-
-# pygame.init()
-# screen=pygame.display.set_mode((600,620))
-# pygame.display.set_caption("Food Screen")
-
-# while True:
-# 	for event in pygame.event.get():
-# 		if event.type==QUIT:
-# 			pygame.quit()
-# 			sys.exit()
-# 	f=Food()
-# 	f.draw_food(screen)
-# 	pygame.display.update()
